@@ -38,7 +38,7 @@ function App() {
 
     const intervalId = setInterval(() => {
       fetchUserId();
-    }, 1000); // Fetch every 5 seconds, adjust as needed
+    }, 1000);
 
     // Cleanup function: clear the interval when the component unmounts
     return () => clearInterval(intervalId);
@@ -80,7 +80,6 @@ function App() {
 
         console.log(`Expiry in ${seconds} seconds.`);
 
-        // Update the state with the new duration
         setExpiry(expiryTime.add(500, 'millisecond').format());
       }, 1000);
 
