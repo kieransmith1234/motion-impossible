@@ -13,6 +13,7 @@ const API_BASE_URL = 'http://localhost:5000';
 function App() {
   const [userId, setUserId] = useState(null);
   const [expiry, setExpiry] = useState(null);
+  const [sessionActive, setSessionActive] = useState(false);
 
   useEffect(() => {
     const fetchUserId = async () => {
@@ -27,9 +28,11 @@ function App() {
         if (userId) {
           setUserId(userId);
           localStorage.setItem('userId', userId);
+          setSessionActive(true);
         } else {
           setUserId(null);
           localStorage.removeItem('userId');
+          setSessionActive(false);
         }
       } catch (error) {
         console.error('Error fetching user ID:', error);
@@ -52,6 +55,7 @@ function App() {
       setUserId(newUserId);
       localStorage.setItem('userId', newUserId);
       localStorage.setItem('expires', response.data.expires);
+      setSessionActive(true);
     } catch (error) {
       console.error('Error creating new session:', error);
     }
@@ -59,11 +63,10 @@ function App() {
 
   const handleDeleteSessionClick = async () => {
     try {
-      console.log('Before deleting session - userId:', userId);
       await axios.get(`${API_BASE_URL}/sessions/destroy`);
       setUserId(null);
       localStorage.removeItem('userId');
-      console.log('After deleting session - userId:', userId);
+      setSessionActive(false);
     } catch (error) {
       console.error('Error deleting session:', error);
     }
@@ -118,6 +121,9 @@ function App() {
           <button className="button delete" onClick={handleDeleteSessionClick}>
             Delete Session
           </button>
+          {sessionActive && (
+            <div className="red-square" />
+          )}
         </Col>
       </Row>
     </Container>
