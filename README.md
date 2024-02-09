@@ -13,4 +13,4 @@ A web application with a NodeJS, ExpressJS and MongoDB backend running on port 5
 
 The purpose is to spawn and destory sessions in an efficient way as to avoid dangling sessions, etc. When you click the Create button it will call the /sessions/create/ endpoint which will create a session with a cookie stored in the MongoStore. The client utilises React and Axios to call the endpoints asynchronously. 
 
-The backend server.js has an asynchronous function run on an interval to clean up the sessions in Mongo that have surpassed their expiration date inside the cookie. 
+The backend server.js has an asynchronous function run on an interval to clean up the sessions in Mongo that have surpassed their expiration date.
