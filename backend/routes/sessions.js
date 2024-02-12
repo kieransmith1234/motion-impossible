@@ -14,8 +14,15 @@ router.get('/create', (req, res) => {
 });
 
 router.get('/destroy', (req, res) => {
-  req.session.destroy();
-  res.send('Session deleted');
+  req.session.destroy((err) => {
+    if (err) {
+      console.error('Error destroying session:', err);
+      res.status(500).send('Error destroying session');
+    } else {
+      res.clearCookie('connect.sid', { path: '/' });
+      res.send('Session deleted');
+    }
+  });
 });
 
 module.exports = router;

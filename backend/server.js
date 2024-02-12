@@ -4,11 +4,12 @@ const MongoStore = require('connect-mongo');
 const { MongoClient } = require('mongodb');
 const cors = require('cors');
 const sessionRouter = require('./routes/sessions');
+const bcrypt = require('bcrypt');
 
 const app = express();
-const port = process.env.PORT || 5000;
-const mongoUri = process.env.MONGO_URI || "mongodb+srv://admin:Charlie.2022@cluster82431.owxe6ji.mongodb.net/sessions";
-const sessionSecret = process.env.SESSION_SECRET || 'secrecy';
+const port = 5000;
+const mongoUri = "mongodb+srv://admin:Charlie.2022@cluster82431.owxe6ji.mongodb.net/sessions";
+const sessionSecret = 'secrecy';
 
 const mongoStore = MongoStore.create({
   mongoUrl: mongoUri,
@@ -30,7 +31,7 @@ app.use(
     resave: false,
     saveUninitialized: true,
     cookie: {
-      maxAge: 60 * 1000,
+      maxAge: 30 * 1000,
     },
   })
 );
@@ -46,7 +47,7 @@ app.get('/', (req, res) => {
 app.get('/get_expiry', (req, res) => {
   const expiry = req.session.cookie._expires;
   res.send(expiry || null);
-});
+})
 
 // MongoDB Connection and Server Start
 const startServer = async () => {
@@ -78,7 +79,7 @@ const startServer = async () => {
             .deleteOne({ _id: session._id });
         }
       });
-    }, 5000);
+    }, 30000);
   } catch (error) {
     console.error('Error connecting to MongoDB:', error);
   }
