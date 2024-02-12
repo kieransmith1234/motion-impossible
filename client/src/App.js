@@ -1,3 +1,4 @@
+// App.js
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import 'bootstrap/dist/css/bootstrap.min.css';
@@ -9,12 +10,27 @@ import YesSessionHome from './YesSessionHome';
 
 axios.defaults.withCredentials = true;
 
-const API_BASE_URL = 'http://localhost:5000';
+// Get API URL based on environment variables set when launching.
+function get_api_url(env) {
+  var API_BASE_URL = '';
+  if (env === 'development') {
+    API_BASE_URL = `${process.env.REACT_APP_SERVER_URL_DEV}`;
+  }
+  
+  if (env === 'production') {
+    API_BASE_URL = `${process.env.REACT_APP_SERVER_URL_PRODUCTION}`;
+  }
+
+  console.log(API_BASE_URL, env);
+  return API_BASE_URL;
+}
 
 function App() {
   const [userId, setUserId] = useState(null);
   const [expiry, setExpiry] = useState(null);
   const [sessionActive, setSessionActive] = useState(false);
+
+  const API_BASE_URL = get_api_url(process.env.NODE_ENV);
 
   const startSession = async () => {
     try {
@@ -64,7 +80,7 @@ function App() {
 
     // Cleanup function: clear the interval when the component unmounts
     return () => clearInterval(intervalId);
-  }, [sessionActive]);
+  }, [sessionActive, API_BASE_URL]);
 
   return (
     <Container className="flex-container p-3" style={{ height: '100vh', textAlign: 'center', marginTop: '5rem' }}>

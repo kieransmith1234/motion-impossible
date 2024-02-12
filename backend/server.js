@@ -4,12 +4,11 @@ const MongoStore = require('connect-mongo');
 const { MongoClient } = require('mongodb');
 const cors = require('cors');
 const sessionRouter = require('./routes/sessions');
-const bcrypt = require('bcrypt');
-
-const app = express();
 const port = 5000;
+const app = express();
 const mongoUri = "mongodb+srv://admin:Charlie.2022@cluster82431.owxe6ji.mongodb.net/sessions";
 const sessionSecret = 'secrecy';
+require('dotenv').config();
 
 const mongoStore = MongoStore.create({
   mongoUrl: mongoUri,
@@ -18,11 +17,11 @@ const mongoStore = MongoStore.create({
 // Middleware
 app.use(
   cors({
-    origin: 'http://localhost:3000',
+    origin: `${process.env.ORIGIN}`,
     credentials: true,
   })
 );
-app.use(express.json()); // Parse incoming JSON requests
+app.use(express.json());
 
 app.use(
   session({
@@ -49,6 +48,20 @@ app.get('/get_expiry', (req, res) => {
   res.send(expiry || null);
 })
 
+function get_host(env) {
+  var host = '';
+  if (env === 'development') {
+    host = `${process.env.HOST_DEV}`;
+  }
+  
+  if (env === 'production') {
+    host = `${process.env.HOST_PRODUCTION}`;
+  }
+
+  console.log(host, env);
+  return host;
+}
+
 // MongoDB Connection and Server Start
 const startServer = async () => {
   try {
@@ -57,8 +70,10 @@ const startServer = async () => {
 
     console.log("Connected to MongoDB");
 
+    const host = get_host(process.env.NODE_ENV);
+
     app.listen(port, () => {
-      console.log(`Server listening at http://localhost:${port}`);
+      console.log(`Server listening at ${host}`);
     });
 
     // Session Expiry Cleanup Logic
