@@ -1,4 +1,5 @@
-import React, { lazy, Suspense, useEffect, useState } from 'react';
+// YesSessionHome
+import React, { lazy, useEffect, useState } from 'react';
 import axios from 'axios';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap/dist/css/bootstrap-grid.min.css';
@@ -56,29 +57,27 @@ function YesSessionHome({ userId, expiry, setExpiry, startSession, killSession }
 
   return (
       <>
-        <Suspense fallback={<div>Loading...</div>}>
-          <Col className="col-md-12">
-            <p>
-              Welcome back! Your user ID is: <span style={{ fontWeight: 'bold' }}>{userId}</span>
-            </p>
-            <p>
-              Session expires in:{' '}
-              {expiry ? (
-                <span>
-                  {moment.duration(moment(expiry).diff(moment())).seconds()}
-                </span>
-              ) : (
-                'unknown'
-              )}
-            </p>
-            <button className="button create" onClick={handleNewSessionClick}>
-              Create session
-            </button>
-            <button className="button delete" onClick={handleDeleteSessionClick}>
-              Delete Session
-            </button>
-          </Col>
-        </Suspense>
+        <Col className="col-md-12">
+          <p>
+            Welcome back! Your user ID is: <span style={{ fontWeight: 'bold' }}>{userId}</span>
+          </p>
+          <p>
+            Session expires in:{' '}
+            {expiry ? (
+              <span>
+                {moment.duration(moment(expiry).diff(moment())).seconds()}
+              </span>
+            ) : (
+              'unknown'
+            )}
+          </p>
+          <button className="button create" onClick={handleNewSessionClick}>
+            Create session
+          </button>
+          <button className="button delete" onClick={handleDeleteSessionClick}>
+            Delete Session
+          </button>
+        </Col>
       </>
   );
 }

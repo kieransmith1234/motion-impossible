@@ -5,7 +5,7 @@ const { CleanWebpackPlugin } = require('clean-webpack-plugin');
 
 const isProduction = process.env.NODE_ENV === 'production';
 
-console.log(process.env.NODE_ENV);
+const API_URL = isProduction ? 'http://77.68.114.237:5000' : 'http://localhost:5000';
 
 const config = {
   entry: './src/index.js',
@@ -43,6 +43,7 @@ const config = {
     new webpack.DefinePlugin({
       'process.env.NODE_ENV': JSON.stringify(process.env.NODE_ENV),
       'process.env.DEBUG': JSON.stringify(process.env.DEBUG),
+      'process.env.API_URL': JSON.stringify(API_URL),
     }),
     new CleanWebpackPlugin(),
     new HtmlWebpackPlugin({
