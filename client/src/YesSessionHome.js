@@ -1,10 +1,10 @@
-import React, { useEffect, useState } from 'react';
+import React, { lazy, Suspense, useEffect, useState } from 'react';
 import axios from 'axios';
-import moment from 'moment';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap/dist/css/bootstrap-grid.min.css';
-import { Col } from 'react-bootstrap';
 import './App.css';
+const Col = lazy(() => import('react-bootstrap/Col'));
+const moment = lazy(() => import('moment'));
 
 axios.defaults.withCredentials = true;
 
@@ -56,27 +56,29 @@ function YesSessionHome({ userId, expiry, setExpiry, startSession, killSession }
 
   return (
       <>
-        <Col className="col-md-12">
-          <p>
-            Welcome back! Your user ID is: <span style={{ fontWeight: 'bold' }}>{userId}</span>
-          </p>
-          <p>
-            Session expires in:{' '}
-            {expiry ? (
-              <span>
-                {moment.duration(moment(expiry).diff(moment())).seconds()}
-              </span>
-            ) : (
-              'unknown'
-            )}
-          </p>
-          <button className="button create" onClick={handleNewSessionClick}>
-            Create session
-          </button>
-          <button className="button delete" onClick={handleDeleteSessionClick}>
-            Delete Session
-          </button>
-        </Col>
+        <Suspense fallback={<div>Loading...</div>}>
+          <Col className="col-md-12">
+            <p>
+              Welcome back! Your user ID is: <span style={{ fontWeight: 'bold' }}>{userId}</span>
+            </p>
+            <p>
+              Session expires in:{' '}
+              {expiry ? (
+                <span>
+                  {moment.duration(moment(expiry).diff(moment())).seconds()}
+                </span>
+              ) : (
+                'unknown'
+              )}
+            </p>
+            <button className="button create" onClick={handleNewSessionClick}>
+              Create session
+            </button>
+            <button className="button delete" onClick={handleDeleteSessionClick}>
+              Delete Session
+            </button>
+          </Col>
+        </Suspense>
       </>
   );
 }

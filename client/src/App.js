@@ -1,36 +1,23 @@
-// App.js
-import React, { useState, useEffect } from 'react';
+import React, { lazy, Suspense, useEffect, useState } from 'react';
 import axios from 'axios';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap/dist/css/bootstrap-grid.min.css';
-import { Container, Row, Col } from 'react-bootstrap';
 import './App.css';
-import NoSessionHome from './NoSessionHome';
-import YesSessionHome from './YesSessionHome';
+const Container = lazy(() => import('react-bootstrap/Container'));
+const Row = lazy(() => import('react-bootstrap/Row'));
+const Col = lazy(() => import('react-bootstrap/Col'));
+const YesSessionHome = React.lazy(() => import('./NoSessionHome'));
+const NoSessionHome = React.lazy(() => import('./NoSessionHome'));
 
 axios.defaults.withCredentials = true;
-
-// Get API URL based on environment variables set when launching.
-function get_api_url(env) {
-  var API_BASE_URL = '';
-  if (env === 'development') {
-    API_BASE_URL = `${process.env.REACT_APP_SERVER_URL_DEV}`;
-  }
-  
-  if (env === 'production') {
-    API_BASE_URL = `${process.env.REACT_APP_SERVER_URL_PRODUCTION}`;
-  }
-
-  console.log(API_BASE_URL, env);
-  return API_BASE_URL;
-}
 
 function App() {
   const [userId, setUserId] = useState(null);
   const [expiry, setExpiry] = useState(null);
   const [sessionActive, setSessionActive] = useState(false);
 
-  const API_BASE_URL = get_api_url(process.env.NODE_ENV);
+  const API_BASE_URL = process.env.REACT_APP_API_URL;
+  console.log(process.env.REACT_APP_API_URL);
 
   const startSession = async () => {
     try {
@@ -82,20 +69,30 @@ function App() {
     return () => clearInterval(intervalId);
   }, [sessionActive, API_BASE_URL]);
 
+  const MemoizedNoSessionHome = React.memo(NoSessionHome);
+  const MemoizedYesSessionHome = React.memo(YesSessionHome);
+
   return (
-    <Container className="flex-container p-3" style={{ height: '100vh', textAlign: 'center', marginTop: '5rem' }}>
-      <Row>
-        <Col className="col-md-12">
-          <h1>Session Spawner</h1>
-        </Col>
+    <Suspense fallback={<div>Loading...</div>}>
+      <Container className="flex-container p-3" style={{ height: '100vh', textAlign: 'center', marginTop: '5rem' }}>
+        <Row>
+          <Col className="col-md-12">
+            <h1>Session Spawner</h1>
+          </Col>
           {sessionActive ? (
-            <YesSessionHome userId={userId} expiry={expiry} setExpiry={setExpiry} startSession={startSession} killSession={killSession} />
+            <MemoizedYesSessionHome userId={userId} expiry={expiry} setExpiry={setExpiry} startSession={startSession} killSession={killSession} />
           ) : (
-            <NoSessionHome startSession={startSession} killSession={killSession} />
+            <MemoizedNoSessionHome startSession={startSession} killSession={killSession} />
           )}
-      </Row>
-    </Container>
+        </Row>
+      </Container>
+    </Suspense>
   );
+}
+
+// Hot Module Replacement
+if (module.hot) {
+  module.hot.accept();
 }
 
 export default App;

@@ -1,31 +1,103 @@
-// webpack.config.js
+const path = require('path');
 const webpack = require('webpack');
+const HtmlWebpackPlugin = require('html-webpack-plugin');
+const { CleanWebpackPlugin } = require('clean-webpack-plugin');
 
-/** @type {import('webpack').Configuration} */
-const webpackConfig = {
-  resolve: {
-    fallback: {
-      path: require.resolve('path-browserify'),
-      os: require.resolve('os-browserify/browser'),
-      crypto: require.resolve('crypto-browserify'),
-      stream: require.resolve('stream-browserify'),
-    },
+const isProduction = process.env.NODE_ENV === 'production';
+
+console.log(process.env.NODE_ENV);
+
+const config = {
+  entry: './src/index.js',
+  module: {
+    rules: [
+      {
+        test: /\.js$/,
+        exclude: /node_modules/,
+        use: {
+          loader: 'babel-loader',
+        },
+      },
+      {
+        test: /\.css$/,
+        use: ['style-loader', 'css-loader'],
+      },
+      {
+        test: /\.(png|svg|jpg|jpeg|gif|ico)$/,
+        exclude: /node_modules/,
+        use: [
+          {
+            loader: 'file-loader',
+            options: {
+              name: '[name].[ext]',
+            },
+          },
+        ],
+      },
+    ],
   },
   plugins: [
     new webpack.ProvidePlugin({
       process: 'process/browser',
-      Buffer: ['buffer', 'Buffer'],
     }),
     new webpack.DefinePlugin({
-      //
+      'process.env.NODE_ENV': JSON.stringify(process.env.NODE_ENV),
+      'process.env.DEBUG': JSON.stringify(process.env.DEBUG),
+    }),
+    new CleanWebpackPlugin(),
+    new HtmlWebpackPlugin({
+      template: 'public/index.html',
+      minify: {
+        removeComments: true,
+        collapseWhitespace: true,
+        removeAttributeQuotes: true,
+      },
+      chunksSortMode: 'auto',
+      publicPath: '/',
+    }),
+    new webpack.IgnorePlugin({
+      resourceRegExp: /^\.\/locale$/,
+      contextRegExp: /moment$/,
     }),
   ],
-  cache: {
-    type: 'filesystem',
-    buildDependencies: {
-      config: [__filename],
+  output: {
+    filename: '[name].bundle.js',
+    path: path.resolve(__dirname, 'dist'),
+    publicPath: '/',
+  },
+  optimization: {
+    splitChunks: {
+      cacheGroups: {
+        vendor: {
+          test: /[\\/]node_modules[\\/]/,
+          name: 'vendors',
+          chunks: 'all',
+        },
+      },
     },
   },
+  mode: process.env.NODE_ENV || 'development',
 };
 
-module.exports = webpackConfig;
+if (!isProduction) {
+  config.devtool = 'hidden-source-map';
+  config.plugins.push(new webpack.HotModuleReplacementPlugin());
+  config.devServer = {
+    allowedHosts: ['localhost:3000'],
+    client: {
+      progress: true,
+    },
+    static: {
+      directory: path.join(__dirname, 'dist'),
+      publicPath: '/',
+    },
+    compress: true,
+    port: 3000,
+    open: true,
+    historyApiFallback: true,
+  };
+} else {
+  config.output.filename = '[name].production.bundle.js';
+}
+
+module.exports = config;
