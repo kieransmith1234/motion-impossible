@@ -1,3 +1,4 @@
+// Webpack config
 const path = require('path');
 const webpack = require('webpack');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
@@ -81,7 +82,7 @@ const config = {
 };
 
 if (!isProduction) {
-  config.devtool = 'hidden-source-map';
+  config.devtool = 'inline-source-map';
   config.plugins.push(new webpack.HotModuleReplacementPlugin());
   config.devServer = {
     allowedHosts: ['localhost:3000'],

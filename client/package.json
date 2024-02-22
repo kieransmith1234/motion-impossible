@@ -36,7 +36,7 @@
     "build": "cross-env NODE_ENV=production webpack --config webpack.config.js",
     "start": "cross-env NODE_ENV=development webpack serve --config webpack.config.js",
     "analyze": "cross-env NODE_ENV=production webpack --config webpack.config.js --profile --json > stats.json && webpack-bundle-analyzer stats.json",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "cross-env NODE_ENV=development react-scripts start"
   },
   "eslintConfig": {
     "extends": [

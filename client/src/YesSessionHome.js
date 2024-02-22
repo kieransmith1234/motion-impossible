@@ -4,8 +4,8 @@ import axios from 'axios';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap/dist/css/bootstrap-grid.min.css';
 import './App.css';
+import moment from 'moment';
 const Col = lazy(() => import('react-bootstrap/Col'));
-const moment = lazy(() => import('moment'));
 
 axios.defaults.withCredentials = true;
 
