@@ -76,8 +76,8 @@ function App() {
     return () => clearInterval(intervalId);
   }, [sessionActive, API_BASE_URL]);
 
-  const MemoizedNoSessionHome = React.memo(NoSessionHome);
-  const MemoizedYesSessionHome = React.memo(YesSessionHome);
+  // const MemoizedNoSessionHome = React.memo(NoSessionHome);
+  // const MemoizedYesSessionHome = React.memo(YesSessionHome);
 
   return (
     <Container className="flex-container p-3" style={{ height: '100vh', textAlign: 'center', marginTop: '5rem' }}>
