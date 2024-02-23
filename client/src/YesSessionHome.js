@@ -37,8 +37,6 @@ function YesSessionHome({ userId, expiry, setExpiry, startSession, killSession }
         const duration = moment.duration(diff);
         const seconds = duration.seconds();
 
-        console.log(`Expiry in ${seconds} seconds.`);
-
         if (isLoaded && seconds <= 0) {
           killSession();
         } else {
@@ -81,5 +79,5 @@ function YesSessionHome({ userId, expiry, setExpiry, startSession, killSession }
       </>
   );
 }
-          
+
 export default YesSessionHome;

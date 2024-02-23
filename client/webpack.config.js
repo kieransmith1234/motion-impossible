@@ -64,7 +64,7 @@ const config = {
   ],
   output: {
     filename: '[name].bundle.js',
-    path: path.resolve(__dirname, 'dist'),
+    path: path.resolve(__dirname, 'build'),
     publicPath: '/',
   },
   optimization: {
@@ -83,7 +83,6 @@ const config = {
 
 if (!isProduction) {
   config.devtool = 'inline-source-map';
-  config.plugins.push(new webpack.HotModuleReplacementPlugin());
   config.devServer = {
     allowedHosts: ['localhost:3000'],
     client: {
@@ -94,7 +93,7 @@ if (!isProduction) {
       publicPath: '/',
     },
     compress: true,
-    hot: true,
+    hot: false,
     port: 3000,
     open: true,
     historyApiFallback: true,

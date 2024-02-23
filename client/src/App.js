@@ -10,7 +10,7 @@ const Col = lazy(() => import('react-bootstrap/Col'));
 const YesSessionHome = React.lazy(() => import('./YesSessionHome'));
 const NoSessionHome = React.lazy(() => import('./NoSessionHome'));
 
-axios.defaults.withCredentials = true;
+axios.defaults.withCredentials = true
 
 function App() {
   const [userId, setUserId] = useState(null);
@@ -32,6 +32,9 @@ function App() {
     try {
       await axios.get(`${API_BASE_URL}/sessions/destroy`);
       setSessionActive(false);
+      setUserId(null);
+      setExpiry(null);
+      localStorage.clear();
     } catch (error) {
       console.error('Error deleting session:', error);
     }
@@ -40,30 +43,15 @@ function App() {
   useEffect(() => {
     const fetchUserId = async () => {
       try {
-        if (sessionActive) {
-          const index_response = await axios.get(`${API_BASE_URL}/`);
-          const userId = index_response.data;
-
-          // Kill the session if it lingers without a userId for whatever reason. 
-          if (!userId) {
-            killSession();
-          }
-
-          const get_expiry_response = await axios.get(`${API_BASE_URL}/get_expiry`);
-          const expiry = get_expiry_response.data;
-
-          setExpiry(expiry);
-          setUserId(userId);
-          localStorage.setItem('userId', userId);
-          localStorage.setItem('expires', expiry);
-
-          console.log(userId + ", " + sessionActive);
-        } else {
-          setUserId(null);
-          setExpiry(null);
-          localStorage.removeItem('userId');
-          localStorage.removeItem('expires');
-        }
+        const userId_response = await axios.get(`${API_BASE_URL}/`);
+        const userId = userId_response.data
+        setUserId(userId);
+        localStorage.setItem('userId', userId);
+        
+        const get_expiry_response = await axios.get(`${API_BASE_URL}/expiry`);
+        const expiry = get_expiry_response.data;
+        setExpiry(expiry);
+        localStorage.setItem('expires', expiry);
       } catch (error) {
         console.error('Error fetching user ID:', error);
       }
@@ -75,7 +63,7 @@ function App() {
 
     // Cleanup function: clear the interval when the component unmounts
     return () => clearInterval(intervalId);
-  }, [killSession, sessionActive, setSessionActive, API_BASE_URL]);
+  }, [killSession, setUserId, setExpiry, sessionActive, userId, expiry, API_BASE_URL]);
 
   return (
     <Container className="flex-container p-3" style={{ height: '100vh', textAlign: 'center', marginTop: '5rem' }}>
@@ -84,20 +72,13 @@ function App() {
           <h1>Session Spawner</h1>
         </Col>
         {sessionActive ? (
-          (() => { console.log('Active'); return null; })(),
           <YesSessionHome userId={userId} expiry={expiry} setExpiry={setExpiry} startSession={startSession} killSession={killSession} />
         ) : (
-          (() => { console.log('Inactive'); return null; })(),
           <NoSessionHome startSession={startSession} killSession={killSession} />
         )}
       </Row>
     </Container>
   );
-}
-
-// Hot Module Replacement
-if (module.hot) {
-  module.hot.accept();
 }
 
 export default App;

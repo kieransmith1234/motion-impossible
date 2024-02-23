@@ -11,6 +11,11 @@ const mongoUri = "mongodb+srv://admin:Charlie.2022@cluster82431.owxe6ji.mongodb.
 const sessionSecret = 'secrecy';
 require('dotenv').config();
 
+const isProduction = process.env.NODE_ENV === 'production';
+
+const host = isProduction ? process.env.HOST_PRODUCTION : process.env.HOST_DEVELOPMENT;
+const origin = isProduction ? process.env.ORIGIN_PRODUCTION : process.env.ORIGIN_DEVELOPMENT;
+
 const mongoStore = MongoStore.create({
   mongoUrl: mongoUri,
 });
@@ -18,23 +23,29 @@ const mongoStore = MongoStore.create({
 // Middleware
 app.use(
   cors({
-    origin: `${process.env.ORIGIN}`,
+    origin: origin,
     credentials: true,
   })
 );
+
 app.use(express.json());
 
 app.use(
   session({
-    store: mongoStore,
     secret: sessionSecret,
     resave: false,
     saveUninitialized: true,
+    store: mongoStore,
     cookie: {
-      maxAge: 30 * 1000,
+      originalMaxAge: 30 * 1000,
     },
   })
 );
+
+app.use((req, res, next) => {
+  console.log(req.session);
+  next();
+});
 
 // Routes
 app.use('/sessions', sessionRouter);
@@ -44,24 +55,10 @@ app.get('/', (req, res) => {
   res.send(userId || null);
 });
 
-app.get('/get_expiry', (req, res) => {
+app.get('/expiry', (req, res) => {
   const expiry = req.session.cookie._expires;
   res.send(expiry || null);
 })
-
-function get_host(env) {
-  var host = '';
-  if (env === 'development') {
-    host = `${process.env.HOST_DEV}`;
-  }
-  
-  if (env === 'production') {
-    host = `${process.env.HOST_PRODUCTION}`;
-  }
-
-  console.log(host, env);
-  return host;
-}
 
 // MongoDB Connection and Server Start
 const startServer = async () => {
@@ -70,8 +67,6 @@ const startServer = async () => {
     await mongoClient.connect();
 
     console.log("Connected to MongoDB");
-
-    const host = get_host(process.env.NODE_ENV);
 
     app.listen(port, () => {
       console.log(`Server listening at ${host}`);
